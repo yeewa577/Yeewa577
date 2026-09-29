@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ภารกิจพิชิตสมรรถภาพทางกาย</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e6f3ff;--ink:#12324a;--card:#fff;--line:#12324a;--blue:#1e88e5;--coral:#ff5a5f;--sun:#ffc933;--grass:#2e9e4f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e2233;--ink:#eaf4ff;--card:#183a55;--line:#8fc4ee}}
+:root[data-theme="dark"]{--bg:#0e2233;--ink:#eaf4ff;--card:#183a55;--line:#8fc4ee}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'Kanit',system-ui,'Noto Sans Thai',sans-serif;min-height:100vh}
+.scr{display:none;max-width:600px;margin:0 auto;padding:14px}.scr.on{display:block}
+h1{font-size:clamp(28px,8vw,44px);line-height:1.15;margin:8px 0;font-weight:800}
+.btn{font:inherit;font-weight:600;font-size:18px;border:3px solid var(--line);background:var(--sun);color:#12324a;border-radius:14px;padding:12px 20px;cursor:pointer;box-shadow:0 4px 0 var(--line);width:100%;margin-top:10px}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.alt{background:#fff}
+.hero{text-align:center;padding-top:20px}
+.stage{margin:18px auto;height:190px;border-radius:22px;background:linear-gradient(#8fd3ff 0 55%,#3fae5a 55%);border:3px solid var(--line);position:relative;overflow:hidden;font-size:54px}
+.stage span{position:absolute;bottom:14px}
+.stage .sun{top:8px;right:16px;bottom:auto;font-size:40px}
+.cnt{display:flex;gap:8px}.cnt button{flex:1;font:inherit;font-size:20px;font-weight:600;padding:10px 0;border-radius:12px;border:3px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.cnt button.on{background:var(--blue);color:#fff}
+.row{background:var(--card);border:3px solid var(--line);border-radius:16px;padding:10px;margin-top:10px}
+.row input{display:block;width:100%;font:inherit;font-size:17px;padding:8px 10px;border-radius:10px;border:2px solid var(--line);margin-top:4px;background:var(--bg);color:var(--ink)}
+.toks{display:flex;gap:6px;margin-top:8px}
+.tk{flex:1;font-size:24px;padding:6px 0;border-radius:10px;border:2px solid var(--line);background:#fff;cursor:pointer}
+.tk.sel{background:var(--sun);box-shadow:0 0 0 3px var(--blue)}.tk.taken{opacity:.35;cursor:not-allowed}
+.sm{font-size:14px;opacity:.85;margin-top:4px;min-height:1.3em}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.timer{font-weight:800;font-size:24px;background:var(--card);border:3px solid var(--line);border-radius:12px;padding:2px 12px}
+.timer.warn{background:var(--coral);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{font-size:14px;background:var(--card);border:2px solid var(--c);border-radius:20px;padding:2px 10px}
+.chip.cur{background:var(--c);color:#fff;font-weight:600}
+.board{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(7,1fr);gap:3px;width:min(100%,560px);aspect-ratio:1;margin:8px auto}
+.cell{position:relative;border:2px solid var(--line);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:clamp(9px,2.4vw,13px);line-height:1.1;color:#12324a;text-align:center;min-width:0}
+.cell i{font-style:normal;font-size:1.7em}.cell b{font-weight:600;font-size:.9em}
+.tQ{background:#bfe0ff}.tM{background:#ffc9c9}.tF{background:#dccbf5}.tB{background:#ffe89a}.tR{background:#d5dde5}.tS{background:#b8ecc4}.tX{background:#ffd27a}
+.w{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:1px;pointer-events:none}
+.pc{background:#fff;border-radius:50%;box-shadow:0 0 0 2px var(--c);font-size:1.6em;line-height:1.1;padding:1px}
+.pc.pop{animation:pop .3s}@keyframes pop{50%{transform:translateY(-8px) scale(1.25)}}
+.mid{grid-area:2/2/7/7;border-radius:14px;border:3px solid #fff;background:radial-gradient(circle at 50% 50%,transparent 0 17%,#fff 17% 18.5%,transparent 18.5%),linear-gradient(90deg,transparent 49%,#fff 49% 51%,transparent 51%),#3fae5a;position:relative;overflow:hidden;font-size:clamp(20px,7vw,40px)}
+.mid span{position:absolute}
+.ctl{text-align:center}
+.dice{font-size:72px;line-height:1;display:inline-block}.dice.shake{animation:sh .15s infinite}
+@keyframes sh{25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+.note{font-size:13px;opacity:.8;text-align:center;margin-top:10px}
+#modal{position:fixed;inset:0;background:rgba(10,30,50,.65);display:none;align-items:center;justify-content:center;padding:16px;z-index:9}
+#modal.on{display:flex}
+.pop-card{background:var(--card);border:4px solid var(--line);border-radius:22px;padding:18px;width:100%;max-width:420px;max-height:88vh;overflow:auto}
+.pop-card h2{margin:0 0 8px;font-size:24px}.pop-card p{margin:6px 0;font-size:18px}
+#toast{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:#12324a;color:#fff;padding:8px 16px;border-radius:20px;z-index:10;display:none;max-width:92vw;text-align:center}
+.rank{display:flex;justify-content:space-between;background:var(--card);border:3px solid var(--line);border-radius:14px;padding:10px 14px;margin-top:8px;font-size:19px}
+</style></head><body>
+<div id="toast"></div>
+
+<section class="scr on" id="home"><div class="hero">
+<div class="stage"><span class="sun">☀️</span><span style="left:8%">🏃‍♀️</span><span style="left:30%">⚽</span><span style="left:50%">🏋️</span><span style="left:72%">🏀</span></div>
+<h1>ภารกิจพิชิตสมรรถภาพทางกาย</h1>
+<p>เกมกระดานที่จะพาผู้เล่นเรียนรู้เรื่องสุขภาพ การออกกำลังกาย และสมรรถภาพทางกาย ผ่านคำถามและภารกิจสนุก ๆ</p>
+<button class="btn" id="bStart" style="font-size:24px;padding:16px">เริ่มเกม</button></div></section>
+
+<section class="scr" id="setup"><h1 style="font-size:28px">ตั้งค่าเกม</h1>
+<p>เลือกจำนวนผู้เล่น</p><div class="cnt" id="cnt"></div>
+<div id="rows"></div>
+<button class="btn" id="bGo" disabled>เริ่มการแข่งขัน</button></section>
+
+<section class="scr" id="game">
+<div class="top"><div id="turn" style="font-weight:600;font-size:18px"></div><div class="timer" id="time">10:00</div></div>
+<div class="chips" id="chips"></div>
+<div class="board" id="board"></div>
+<div class="ctl"><div class="dice" id="dice">🎲</div><button class="btn" id="bRoll">🎲 ทอยลูกเต๋า</button></div>
+<p class="note">หากรู้สึกเจ็บ เหนื่อยผิดปกติ หรือไม่พร้อม ให้หยุดกิจกรรมและแจ้งครู</p></section>
+
+<section class="scr" id="end"><h1 style="font-size:30px">🏆 สรุปผลการแข่งขัน</h1><div id="ranks"></div>
+<button class="btn" id="bAgain">🔄 เล่นใหม่</button><button class="btn alt" id="bHome">🏠 กลับหน้าแรก</button></section>
+
+<div id="modal"><div class="pop-card"><h2 id="ch"></h2><div id="cb"></div><div id="ca"></div></div></div>
+
+<script>
+const $=id=>document.getElementById(id),rnd=n=>Math.floor(Math.random()*n),sh=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const TOK=[['⚽','ฟุตบอล'],['🏀','บาสเกตบอล'],['🏆','ถ้วยรางวัล'],['👟','รองเท้า'],['🏃','นักวิ่ง'],['🎯','เป้าหมาย']];
+const COL=['#e53935','#1e88e5','#43a047','#fb8c00','#8e24aa','#00acc1'],FACE=['⚀','⚁','⚂','⚃','⚄','⚅'];
+const IC={Q:'❓',M:'🏃',F:'💪',B:'⭐',R:'⏸️'};
+const TYPES='S'+'QMFQBMQRFMQBMFQRMQFBMQ'+'X';
+const QS=[
+['การออกกำลังกายอย่างสม่ำเสมอมีประโยชน์ข้อใด?','ทำให้ร่างกายแข็งแรง','ทำให้ไม่ต้องพักผ่อน','ทำให้ไม่ต้องรับประทานอาหาร'],
+['ก่อนออกกำลังกายควรทำสิ่งใด?','อบอุ่นร่างกาย','นอนทันที','ดื่มน้ำอัดลมปริมาณมาก'],
+['การวิ่งระยะไกลช่วยพัฒนาสมรรถภาพด้านใดมากที่สุด?','ความอดทนของหัวใจและปอด','ความแข็งแรงของนิ้วมือ','ความเร็วในการพูด'],
+['ระหว่างออกกำลังกายควรดื่มน้ำอย่างไร?','จิบน้ำเป็นระยะ','ไม่ดื่มน้ำเลย','ดื่มน้ำหวานครั้งละหลายแก้ว'],
+['การยืดเหยียดกล้ามเนื้อช่วยพัฒนาเรื่องใด?','ความอ่อนตัว','ความสูงทันที','ไม่ต้องอบอุ่นร่างกาย'],
+['วัยมัธยมควรนอนหลับประมาณกี่ชั่วโมงต่อคืน?','8–10 ชั่วโมง','2–3 ชั่วโมง','ไม่ต้องนอน'],
+['อาหารแบบใดช่วยให้ร่างกายแข็งแรง?','อาหารครบ 5 หมู่','ขนมกรุบกรอบอย่างเดียว','น้ำอัดลมอย่างเดียว'],
+['หลังออกกำลังกายเสร็จควรทำสิ่งใด?','คูลดาวน์ให้ร่างกายผ่อนคลาย','หยุดนิ่งแล้วนอนทันที','กินอาหารทอดมาก ๆ']];
+const MS=[['ทำ Squat 8 ครั้ง',2],['ทำ Jumping Jack 10 ครั้ง',2],['ทำ High Knees 15 วินาที',3],['ทำท่ายืดเหยียด 15 วินาที',2],['บอกประโยชน์ของการออกกำลังกาย 2 ข้อ',3],['ทรงตัวขาเดียว 10 วินาที',2]];
+const FS=['ทำ Squat 10 ครั้ง','ทำ High Knees 20 วินาที','ยืดกล้ามเนื้อขา 15 วินาที'];
+let S='home',P=[],cur=0,left=600,gid=0,tm=null,extra=false,N=2,pick=[],qb=[],mb=[],fb=[],cells=[];
+const later=(f,ms)=>{const g=gid;return setTimeout(()=>{if(g===gid)f()},ms)};
+const nxt=(b,src)=>{if(!b.length)b.push(...sh(src));return b.pop()};
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.toggle('on',s.id===id));S=id;window.scrollTo(0,0)}
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',2600)}
+
+/* setup */
+function openSetup(){N=2;buildSetup();show('setup')}
+function buildSetup(){
+ const c=$('cnt');c.innerHTML='';
+ for(let n=2;n<=6;n++){const b=document.createElement('button');b.textContent=n+' คน';b.className=n===N?'on':'';b.onclick=()=>{N=n;buildSetup()};c.appendChild(b)}
+ const w=$('rows');w.innerHTML='';pick=Array(N).fill(-1);
+ for(let i=0;i<N;i++){
+  const r=document.createElement('div');r.className='row';
+  r.innerHTML=`<label>ผู้เล่น ${i+1}<input maxlength="12" placeholder="กรอกชื่อ" id="nm${i}"></label><div class="toks"></div><div class="sm"></div>`;
+  const tk=r.querySelector('.toks');
+  TOK.forEach((t,j)=>{const b=document.createElement('button');b.className='tk';b.onclick=()=>{if(pick.includes(j)&&pick[i]!==j)return;pick[i]=pick[i]===j?-1:j;refresh(
