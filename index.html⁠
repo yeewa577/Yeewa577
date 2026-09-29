@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ภารกิจพิชิตระบบไหลเวียนเลือด - Quiz Game ม.3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Kanit', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #2b080c 0%, #6b1119 50%, #1a0305 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Header & Badges */
+    .game-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .game-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #ff4d6d;
+      text-shadow: 0 0 10px rgba(255, 77, 109, 0.5);
+    }
+    .subtitle {
+      font-size: 0.95rem;
+      color: #ffccd5;
+    }
+
+    /* Card System */
+    .card {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Inputs & Buttons */
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 2px solid #ff4d6d;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      font-size: 1.1rem;
+      text-align: center;
+      outline: none;
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 77, 109, 0.6);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      margin-top: 10px;
+    }
+
+    /* Dashboard Bar */
+    .dash-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 10px 16px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+    .star-badge {
+      color: #ffb703;
+      font-size: 1.2rem;
+    }
+
+    /* Timer & Progress */
+    .timer-container {
+      margin-bottom: 15px;
+    }
+    .timer-bar-bg {
+      width: 100%;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .timer-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: #ff4d6d;
+      transition: width 1s linear;
+    }
+    .timer-text {
+      text-align: right;
+      font-size: 0.85rem;
+      color: #ffccd5;
+      margin-top: 4px;
+    }
+
+    /* Options Grid */
+    .question-box {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .opt-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: white;
+      padding: 14px 18px;
+      border-radius: 12px;
+      text-align: left;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .opt-btn:hover:not(:disabled) {
+      background: rgba(255, 77, 109, 0.2);
+      border-color: #ff4d6d;
+    }
+    .opt-btn.correct {
+      background: #2a9d8f !important;
+      border-color: #2a9d8f !important;
+      color: white;
+    }
+    .opt-btn.wrong {
+      background: #e63946 !important;
+      border-color: #e63946 !important;
+      color: white;
+    }
+
+    /* Leaderboard Table */
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    th, td {
+      padding: 10px 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    th {
+      background: rgba(255, 77, 109, 0.3);
+      color: #ffccd5;
+    }
+    tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .badge {
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-excellent { background: #2a9d8f; color: white; }
+    .badge-vgood { background: #48cae4; color: black; }
+    .badge-good { background: #ffb703; color: black; }
+    .badge-fair { background: #fb8500; color: white; }
+    .badge-needimp { background: #e63946; color: white; }
+
+    /* Sound Control */
+    .sound-toggle {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <button class="sound-toggle" onclick="toggleSound()" id="soundBtn">🔊 เสียง: เปิด</button>
+
+    <!-- หน้า 1: ต้อนรับ -->
+    <div id="screen-welcome" class="card">
+      <div class="game-header">
+        <h1 class="game-title">❤️ ภารกิจพิชิตระบบไหลเวียนเลือด</h1>
+        <p class="subtitle">วิชาสุขศึกษา ระดับชั้นมัธยมศึกษาปีที่ 3</p>
+      </div>
+      <p style="text-align: center; margin-bottom: 20px; color: #e0e0e0; font-size: 0.95rem;">
+        ทบทวนความรู้ระบบไหลเวียนเลือดผ่านแบบทดสอบ 12 ข้อ<br>
+        ตอบถูกรักษาดาว ตอบผิดหรือหมดเวลาเสีย 100 ดาว!
+      </p>
+      <button class="btn btn-primary" onclick="showScreen('screen-register')">🚀 เริ่มเกม</button>
+    </div>
+
+    <!-- หน้า 2: ลงทะเบียน -->
+    <div id="screen-register" class="card hidden">
+      <div class="game-header">
+        <h2 style="font-size: 1.4rem;">กรอกชื่อผู้เข้าสอบ</h2>
+        <p class="subtitle">⭐ คุณมีดาวเริ่มต้น 1,200 ดวง</p>
+      </div>
+      <input type="text" id="playerName" placeholder="พิมพ์ ชื่อ - นามสกุล ของคุณ..." maxlength="40">
+      <button class="btn btn-primary" onclick="startGame()">เข้าสู่การทดสอบ 🎯</button>
+    </div>
+
+    <!-- หน้า 3-14: คำถาม -->
+    <div id="screen-quiz" class="card hidden">
+      <div class="dash-bar">
+        <span id="qIndexText">ข้อที่ 1/12</span>
+        <span class="star-badge" id="starText">⭐ 1,200</span>
+      </div>
+
+      <div class="timer-container">
+        <div class="timer-bar-bg">
+          <div class="timer-bar-fill" id="timerFill"></div>
+        </div>
+        <div class="timer-text" id="timerText">⏱️ เวลาที่เหลือ: 7 วินาที</div>
+      </div>
+
+      <div class="question-box" id="questionText">คำถามจะแสดงที่นี่</div>
+
+      <div class="options-grid" id="optionsContainer">
+        <!-- ตัวเลือกจะถูกสร้างด้วย JS -->
+      </div>
+    </div>
+
+    <!-- หน้าสรุปผล -->
+    <div id="screen-summary" class="card hidden">
+      <div class="game-header">
+        <h2 style="font-size: 1.5rem; color: #2a9d8f;">🎉 สรุปผลการเรียนรู้</h2>
+        <p class="subtitle" id="summaryPlayerName">ผู้เล่น: -</p>
+      </div>
+
+      <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center;">
+        <div style="font-size: 2rem; font-weight: 700; color: #ffb703; margin-bottom: 5px;" id="finalStars">⭐ 1,200 ดาว</div>
+        <div id="gradeBadge" class="badge badge-excellent" style="font-size: 1rem; display: inline-block;">ระดับ: ดีเยี่ยม</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem; margin-bottom: 15px;">
+        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">✅ ตอบถูก: <b id="correctCountText">0</b> ข้อ</div>
+        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">❌ ตอบผิด: <b id="wrongCountText">0</b> ข้อ</div>
+        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">⏳ ไม่ได้ตอบ: <b id="unansweredCountText">0</b> ข้อ</div>
+        <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">📊 ร้อยละ: <b id="percentText">0%</b></div>
+      </div>
+
+      <button class="btn btn-primary" onclick="showLeaderboard()">🏆 ดูตารางคะแนนรวม</button>
+      <button class="btn btn-secondary" onclick="resetGame()">🔄 เล่นใหม่อีกครั้ง</button>
+    </div>
+
+    <!-- หน้าตารางคะแนนรวม -->
+    <div id="screen-leaderboard" class="card hidden">
+      <div class="game-header">
+        <h2 style="font-size: 1.4rem; color: #ffb703;">🏆 ตารางคะแนนรวม (Top 30)</h2>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>อันดับ</th>
+              <th>ชื่อ-นามสกุล</th>
+              <th>ถูก</th>
+              <th>ผิด</th>
+              <th>ไม่ตอบ</th>
+              <th>ดาว</th>
+              <th>ผลประเมิน</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <!-- ข้อมูลอันดับจะสร้างจาก JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <button class="btn btn-primary" style="margin-top: 15px;" onclick="resetGame()">🎮 เข้าสู่หน้าหลัก</button>
+      <button class="btn btn-secondary" style="background: rgba(230,57,70,0.3);" onclick="clearLeaderboard()">🗑️ ล้างข้อมูลตารางคะแนน</button>
+    </div>
+
+  </div>
+
+  <script>
+    // คลังคำถาม 12 ข้อตามโจทย์
+    const questions = [
+      {
+        q: "1. อวัยวะใดเป็นศูนย์กลางสำคัญของระบบไหลเวียนเลือด",
+        options: ["ก. ปอด", "ข. หัวใจ", "ค. ตับ", "ง. ไต"],
+        ans: 1
+      },
+      {
+        q: "2. หน้าที่สำคัญของเม็ดเลือดแดงคืออะไร",
+        options: [
+          "ก. ช่วยสร้างภูมิคุ้มกัน",
+          "ข. ช่วยให้เลือดแข็งตัว",
+          "ค. ลำเลียงออกซิเจนไปยังส่วนต่าง ๆ ของร่างกาย",
+          "ง. กำจัดเชื้อโรคในร่างกาย"
+        ],
+        ans: 2
+      },
+      {
+        q: "3. หลอดเลือดชนิดใดนำเลือดออกจากหัวใจ",
+        options: ["ก. หลอดเลือดแดง", "ข. หลอดเลือดดำ", "ค. หลอดเลือดฝอย", "ง. ท่อน้ำเหลือง"],
+        ans: 0
+      },
+      {
+        q: "4. หลอดเลือดชนิดใดทำหน้าที่แลกเปลี่ยนก๊าซและสารต่าง ๆ ระหว่างเลือดกับเซลล์",
+        options: ["ก. หลอดเลือดแดง", "ข. หลอดเลือดดำ", "ค. หลอดเลือดฝอย", "ง. หลอดเลือดใหญ่"],
+        ans: 2
+      },
+      {
+        q: "5. ห้องใดของหัวใจทำหน้าที่สูบฉีดเลือดที่มีออกซิเจนไปเลี้ยงส่วนต่าง ๆ ของร่างกาย",
+        options: ["ก. ห้องบนขวา", "ข. ห้องล่างขวา", "ค. ห้องบนซ้าย", "ง. ห้องล่างซ้าย"],
+        ans: 3
+      },
+      {
+        q: "6. เลือดที่มีออกซิเจนต่ำจากส่วนต่าง ๆ ของร่างกายจะไหลกลับเข้าสู่หัวใจบริเวณใด",
+        options: ["ก. หัวใจห้องบนขวา", "ข. หัวใจห้องบนซ้าย", "ค. หัวใจห้องล่างขวา", "ง. หัวใจห้องล่างซ้าย"],
+        ans: 0
+      },
+      {
+        q: "7. ส่วนประกอบใดของเลือดมีหน้าที่ช่วยให้เลือดแข็งตัวเมื่อเกิดบาดแผล",
+        options: ["ก. เม็ดเลือดแดง", "ข. เม็ดเลือดขาว", "ค. เกล็ดเลือด", "ง. พลาสมา"],
+        ans: 2
+      },
+      {
+        q: "8. เม็ดเลือดขาวมีหน้าที่สำคัญอย่างไร",
+        options: [
+          "ก. ลำเลียงออกซิเจน",
+          "ข. ป้องกันและต่อสู้กับเชื้อโรค",
+          "ค. ช่วยให้เลือดแข็งตัว",
+          "ง. ลำเลียงสารอาหารเพียงอย่างเดียว"
+        ],
+        ans: 1
+      },
+      {
+        q: "9. ข้อใดเป็นพฤติกรรมที่ช่วยส่งเสริมสุขภาพของระบบไหลเวียนเลือด",
+        options: [
+          "ก. รับประทานอาหารรสเค็มและมันเป็นประจำ",
+          "ข. ออกกำลังกายอย่างสม่ำเสมอ",
+          "ค. นอนดึกทุกวัน",
+          "ง. สูบบุหรี่เป็นประจำ"
+        ],
+        ans: 1
+      },
+      {
+        q: "10. การออกกำลังกายอย่างสม่ำเสมอมีผลต่อระบบไหลเวียนเลือดอย่างไร",
+        options: [
+          "ก. ทำให้หัวใจและระบบไหลเวียนเลือดทำงานมีประสิทธิภาพมากขึ้น",
+          "ข. ทำให้เลือดหยุดไหลง่ายขึ้น",
+          "ค. ทำให้หลอดเลือดทำงานลดลง",
+          "ง. ทำให้หัวใจหยุดเต้นช้าลงจนผิดปกติ"
+        ],
+        ans: 0
+      },
+      {
+        q: "11. ข้อใดกล่าวถูกต้องเกี่ยวกับหลอดเลือดดำ",
+        options: [
+          "ก. นำเลือดออกจากหัวใจเป็นหลัก",
+          "ข. นำเลือดกลับเข้าสู่หัวใจเป็นหลัก",
+          "ค. ทำหน้าที่แลกเปลี่ยนสารกับเซลล์โดยตรงเป็นหลัก",
+          "ง. มีผนังหนากว่าหลอดเลือดแดงเสมอ"
+        ],
+        ans: 1
+      },
+      {
+        q: "12. ข้อใดเป็นวิธีที่เหมาะสมในการดูแลระบบไหลเวียนเลือด",
+        options: [
+          "ก. รับประทานอาหารที่มีไขมันสูงเป็นประจำ",
+          "ข. หลีกเลี่ยงการออกกำลังกาย",
+          "ค. รับประทานอาหารที่มีประโยชน์ ออกกำลังกาย และพักผ่อนให้เพียงพอ",
+          "ง. สูบบุหรี่เพื่อช่วยลดความเครียด"
+        ],
+        ans: 2
+      }
+    ];
+
+    // สถานะเกม
+    let playerName = "";
+    let currentQ = 0;
+    let stars = 1200;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let unansweredCount = 0;
+
+    let timerInterval = null;
+    let timeLeft = 7;
+    let isAnswered = false;
+    let soundEnabled = true;
+
+    // ระบบสร้างเสียงแบบสังเคราะห์ (Web Audio API)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(freq, duration, type = "sine") {
+      if (!soundEnabled) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('soundBtn').innerText = soundEnabled ? "🔊 เสียง: เปิด" : "🔇 เสียง: ปิด";
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.card').forEach(el => el.classList.add('hidden'));
+      document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    function startGame() {
+      const input = document.getElementById('playerName').value.trim();
+      if (!input) {
+        alert("กรุณากรอกชื่อ-นามสกุลก่อนเริ่มเล่นเกมครับ");
+        return;
+      }
+      playerName = input;
+      currentQ = 0;
+      stars = 1200;
+      correctCount = 0;
+      wrongCount = 0;
+      unansweredCount = 0;
+
+      showScreen('screen-quiz');
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      isAnswered = false;
+      timeLeft = 7;
+
+      const qData = questions[currentQ];
+      document.getElementById('qIndexText').innerText = `ข้อที่ ${currentQ + 1}/12`;
+      document.getElementById('starText').innerText = `⭐ ${stars}`;
+      document.getElementById('questionText').innerText = qData.q;
+
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = "";
+
+      qData.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = optText;
+        btn.onclick = () => selectOption(idx);
+        container.appendChild(btn);
+      });
+
+      updateTimerUI();
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerUI();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function updateTimerUI() {
+      document.getElementById('timerText').innerText = `⏱️ เวลาที่เหลือ: ${timeLeft} วินาที`;
+      const fillPercent = (timeLeft / 7) * 100;
+      document.getElementById('timerFill').style.width = `${fillPercent}%`;
+      if (timeLeft <= 2) {
+        playBeep(800, 0.1, "square");
+      }
+    }
+
+    function selectOption(selectedIndex) {
+      if (isAnswered) return;
+      isAnswered = true;
+      clearInterval(timerInterval);
+
+      const qData = questions[currentQ];
+      const buttons = document.querySelectorAll('.opt-btn');
+
+      buttons.forEach(btn => btn.disabled = true);
+
+      if (selectedIndex === qData.ans) {
+        // ตอบถูก
+        buttons[selectedIndex].classList.add('correct');
+        correctCount++;
+        playBeep(600, 0.2, "sine");
+      } else {
+        // ตอบผิด
+        buttons[selectedIndex].classList.add('wrong');
+        buttons[qData.ans].classList.add('correct');
+        wrongCount++;
+        deductStars();
+        playBeep(200, 0.3, "sawtooth");
+      }
+
+      setTimeout(nextQuestion, 1500);
+    }
+
+    function handleTimeout() {
+      if (isAnswered) return;
+      isAnswered = true;
+
+      const qData = questions[currentQ];
+      const buttons = document.querySelectorAll('.opt-btn');
+
+      buttons.forEach(btn => btn.disabled = true);
+      buttons[qData.ans].classList.add('correct');
+
+      unansweredCount++;
+      deductStars();
+      playBeep(150, 0.4, "sawtooth");
+
+      setTimeout(nextQuestion, 1500);
+    }
+
+    function deductStars() {
+      stars = Math.max(0, stars - 100);
+      document.getElementById('starText').innerText = `⭐ ${stars}`;
+    }
+
+    function nextQuestion() {
+      currentQ++;
+      if (currentQ < questions.length) {
+        loadQuestion();
+      } else {
+        finishGame();
+      }
+    }
+
+    function getGrade(starCount) {
+      if (starCount >= 1200) return { text: "ดีเยี่ยม", class: "badge-excellent" };
+      if (starCount >= 1000) return { text: "ดีมาก", class: "badge-vgood" };
+      if (starCount >= 800) return { text: "ดี", class: "badge-good" };
+      if (starCount >= 600) return { text: "พอใช้", class: "badge-fair" };
+      return { text: "ควรปรับปรุง", class: "badge-needimp" };
+    }
+
+    function finishGame() {
+      showScreen('screen-summary');
+
+      const percent = Math.round((correctCount / 12) * 100);
+      const grade = getGrade(stars);
+
+      document.getElementById('summaryPlayerName').innerText = `ผู้เล่น: ${playerName}`;
+      document.getElementById('finalStars').innerText = `⭐ ${stars} ดาว`;
+      document.getElementById('correctCountText').innerText = correctCount;
+      document.getElementById('wrongCountText').innerText = wrongCount;
+      document.getElementById('unansweredCountText').innerText = unansweredCount;
+      document.getElementById('percentText').innerText = `${percent}%`;
+
+      const badgeEl = document.getElementById('gradeBadge');
+      badgeEl.innerText = `ระดับ: ${grade.text}`;
+      badgeEl.className = `badge ${grade.class}`;
+
+      // บันทึกลง LocalStorage
+      saveToLeaderboard({
+        name: playerName,
+        correct: correctCount,
+        wrong: wrongCount,
+        unanswered: unansweredCount,
+        stars: stars,
+        grade: grade.text
+      });
+    }
+
+    function saveToLeaderboard(record) {
+      let data = JSON.parse(localStorage.getItem('blood_quiz_lb') || '[]');
+      data.push(record);
+
+      // จัดอันดับ: ดาวมากไปน้อย -> ถ้าเท่ากันดูตอบถูกมากไปน้อย
+      data.sort((a, b) => {
+        if (b.stars !== a.stars) return b.stars - a.stars;
+        return b.correct - a.correct;
+      });
+
+      // เก็บสูงสุด 30 คน
+      data = data.slice(0, 30);
+      localStorage.setItem('blood_quiz_lb', JSON.stringify(data));
+    }
+
+    function showLeaderboard() {
+      showScreen('screen-leaderboard');
+      const tbody = document.getElementById('leaderboardBody');
+      tbody.innerHTML = "";
+
+      const data = JSON.parse(localStorage.getItem('blood_quiz_lb') || '[]');
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7">ยังไม่มีข้อมูลผู้เล่น</td></tr>`;
+        return;
+      }
+
+      let currentRank = 1;
+      data.forEach((item, idx) => {
+        // จัดอันดับร่วม
+        if (idx > 0) {
+          const prev = data[idx - 1];
+          if (item.stars !== prev.stars || item.correct !== prev.correct) {
+            currentRank = idx + 1;
+          }
+        }
+
+        const gradeInfo = getGrade(item.stars);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><b>${currentRank}</b></td>
+          <td style="text-align:left;">${item.name}</td>
+          <td style="color:#2a9d8f;">${item.correct}</td>
+          <td style="color:#e63946;">${item.wrong}</td>
+          <td>${item.unanswered}</td>
+          <td><b>⭐ ${item.stars}</b></td>
+          <td><span class="badge ${gradeInfo.class}">${item.grade}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function clearLeaderboard() {
+      if (confirm("คุณต้องการล้างข้อมูลอันดับทั้งหมดใช่หรือไม่?")) {
+        localStorage.removeItem('blood_quiz_lb');
+        showLeaderboard();
+      }
+    }
+
+    function resetGame() {
+      document.getElementById('playerName').value = "";
+      showScreen('screen-welcome');
+    }
+  </script>
+</body>
+</html>
